@@ -1,18 +1,18 @@
 #!/bin/sh
 
-# Generates a GitHub URL for a file in a git repository at a specific commit.
-# Usage: giturl [-l line_number] <file_path>
-# Example: giturl -l 42 myfile.txt
+# Generates a GitHub URL for a file in a git repository at a specific commit or branch.
+# Usage: giturl [-l line_number] [-b] <file_path>
+# Example: giturl -l 42 -b myfile.txt
 
 print_usage_and_exit() {
     reason=$1
     echo "$reason" >&2
-    echo "Usage: giturl [-l line_number] <file_path>" >&2
+    echo "Usage: giturl [-l line_number] [-b] <file_path>" >&2
     exit 1
 }
 
 # Parse command-line options
-while getopts ":l:" opt; do
+while getopts ":l:b" opt; do
     case $opt in
         l)
             # Capture the line number argument
@@ -22,6 +22,9 @@ while getopts ":l:" opt; do
                 print_usage_and_exit "Line number must be a numeric value."
             fi
             line_number="$OPTARG"
+            ;;
+        b)
+            ref_type="branch"
             ;;
         \?)
             # Handle invalid options
@@ -45,8 +48,12 @@ fi
 # Get the repository's remote URL and convert it to an HTTPS GitHub URL
 repo_url=$(git config remote.origin.url | sed 's,git@github.com:,https://github.com/,' | sed 's,\.git,,')
 
-# Get the current commit hash
-ref=$(git rev-parse --short HEAD 2>/dev/null)
+# Get the current commit hash or branch name
+if [ "$ref_type" = "branch" ]; then
+    ref=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+else
+    ref=$(git rev-parse --short HEAD 2>/dev/null)
+fi
 if [ -z "$ref" ]; then
     echo "Error: Unable to find a git revision. Ensure the repository has at least one commit." >&2
     exit 1
@@ -59,7 +66,7 @@ if [ -z "$file_path" ]; then
     exit 1
 fi
 
-# Construct the GitHub URL for the file at the specific commit
+# Construct the GitHub URL for the file at the specific ref
 file_url=$repo_url/blob/$ref/$file_path
 
 # Append the line number fragment to the URL if provided
