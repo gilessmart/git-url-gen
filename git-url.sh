@@ -50,9 +50,9 @@ repo_url=$(git config remote.origin.url | sed 's,git@github.com:,https://github.
 
 # Get the current commit hash or branch name
 if [ "$ref_type" = "branch" ]; then
-    ref=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    ref=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
 else
-    ref=$(git rev-parse --short HEAD 2>/dev/null)
+    ref=$(git rev-parse --short HEAD 2> /dev/null)
 fi
 if [ -z "$ref" ]; then
     echo "Error: Unable to find a git revision. Ensure the repository has at least one commit." >&2
@@ -60,10 +60,20 @@ if [ -z "$ref" ]; then
 fi
 
 # Get the file path relative to the repository root
-file_path=$(git ls-files --full-name "$1" 2>/dev/null)
+# -z is used becuase ls-files may otherwise add quotes
+# tr is used to remove the null character added by -z
+file_path=$(git ls-files -z --full-name "$1" 2> /dev/null | tr -d '\0')
 if [ -z "$file_path" ]; then
     echo "Error: File not found in the repository." >&2
     exit 1
+fi
+
+# If we've got jq, use it to encode the file path
+if [ $(which jq 2> /dev/null) ]; then
+    # Encode using jq
+    file_path=$(echo -n "$file_path" | jq -R -s -r @uri)
+    # Decode characters that GitHub doesn't encode back to what they were 
+    file_path=$(echo "$file_path" | sed 's/%2F/\//g' | sed 's/%28/(/g' | sed 's/%29/)/g')
 fi
 
 # Construct the GitHub URL for the file at the specific ref

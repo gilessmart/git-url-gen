@@ -54,6 +54,11 @@ command="./git-url.sh -b -l 42 README.md"
 expected="https://github.com/gilessmart/git-url-gen/blob/$branch_name/README.md#L42"
 test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
 
+description="With a file name that needs encoding"
+command="./git-url.sh test-files/¬£%^&()_+-=[]{};:@#~<>,.?|"
+expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/test-files/%C2%AC%C2%A3%25%5E%26()_%2B-%3D%5B%5D%7B%7D%3B%3A%40%23~%3C%3E%2C.%3F%7C"
+test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
+
 if [ $failed_tests -eq 0 ]; then
     echo "All tests passed"
 else
