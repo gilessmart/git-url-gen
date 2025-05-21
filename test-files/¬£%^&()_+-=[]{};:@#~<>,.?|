@@ -1,3 +1,0 @@
-This file is used for testing that special characters in file paths are URL-encoded as expected.
-The filename is made of nearly every non-alpha-numeric character on my keyboard.
-I left out `!"'$* and space due to the need for them to be escaped on the command line and/or in shell scripts.

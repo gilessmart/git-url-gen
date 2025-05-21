@@ -1,0 +1,6 @@
+File used for testing URLs are constructed as expected & illustrating what the script does in the README.
+
+
+
+(Empty lines added to help demonstrate the -l option..)
+

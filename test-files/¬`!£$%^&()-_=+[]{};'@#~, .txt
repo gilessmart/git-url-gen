@@ -1,0 +1,2 @@
+This file is used for testing special characters in file paths are URL-encoded as expected.
+The file name is made from all the non-alpha-numeric characters on my keyboard, and space, excluding reserved characters on Windows.
