@@ -73,7 +73,13 @@ if [ $(which jq 2> /dev/null) ]; then
     # Encode using jq
     file_path=$(echo -n "$file_path" | jq -R -s -r @uri)
     # Decode characters that GitHub doesn't encode back to what they were 
-    file_path=$(echo "$file_path" | sed 's/%2F/\//g' | sed 's/%28/(/g' | sed 's/%29/)/g')
+    file_path=$(echo "$file_path" \
+        | sed "s/%2F/\//g" \
+        | sed "s/%28/(/g" \
+        | sed "s/%29/)/g" \
+        | sed "s/%21/!/g" \
+        | sed "s/%27/'/g" \
+        | sed "s/%2A/*/g")
 fi
 
 # Construct the GitHub URL for the file at the specific ref

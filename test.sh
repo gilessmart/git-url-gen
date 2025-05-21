@@ -68,6 +68,11 @@ command="./git-url.sh 'test-files/file with spaces'"
 expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/test-files/file%20with%20spaces"
 test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
 
+description="With a file name with extra-special characters"
+command="./git-url.sh 'test-files/\`!\"'\''\$*'"
+expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/test-files/%60!%22'%24*"
+test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
+
 if [ $failed_tests -eq 0 ]; then
     echo "All tests passed"
 else
