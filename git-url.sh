@@ -68,9 +68,23 @@ if [ -z "$file_path" ]; then
     exit 1
 fi
 
-# If we've got jq, use it to encode the file path
+# If we've got jq, use it for URL encoding
 if [ $(which jq 2> /dev/null) ]; then
-    # Encode using jq
+    # If the ref is a branch..
+    if [ "$ref_type" = "branch" ]; then
+        # Encode using jq
+        ref=$(echo -n "$ref" | jq -R -s -r @uri)
+        # Decode characters that GitHub doesn't encode back to what they were 
+        ref=$(echo "$ref" \
+            | sed "s/%2F/\//g" \
+            | sed "s/%28/(/g" \
+            | sed "s/%29/)/g" \
+            | sed "s/%21/!/g" \
+            | sed "s/%27/'/g" \
+            | sed "s/%2A/*/g")
+    fi
+
+    # Encode file path using jq
     file_path=$(echo -n "$file_path" | jq -R -s -r @uri)
     # Decode characters that GitHub doesn't encode back to what they were 
     file_path=$(echo "$file_path" \
