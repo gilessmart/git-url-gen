@@ -40,9 +40,9 @@ done
 # Shift positional arguments to remove processed options
 shift $((OPTIND - 1))
 
-# Ensure at least one argument (file path) is provided
-if [ $# -lt 1 ]; then
-    print_usage_and_exit "Error: Missing required argument (file_path)."
+# Ensure exactly one file path argument is provided
+if [ $# != 1 ]; then
+    print_usage_and_exit "Error: Exactly one file_path is required."
 fi
 
 # Get the repository's remote URL and convert it to an HTTPS GitHub URL
