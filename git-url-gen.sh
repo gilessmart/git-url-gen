@@ -79,8 +79,20 @@ fi
 relative_path_start=$((${#repo_root_path} + 1))
 relative_path=$(echo "$full_path" | cut -c ${relative_path_start}-)
 
-# Get the repository's remote URL and convert it to an HTTPS GitHub URL
-repo_url=$(git config remote.origin.url | sed 's,git@github.com:,https://github.com/,' | sed 's,\.git,,')
+# Try to get the remote the current branch is tracking
+remote=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null | cut -d'/' -f1)
+# Failing that, use "origin" if it exists
+if [ -z "$remote" ] && git remote | grep -q '^origin$'; then
+    remote="origin"
+fi
+# If that fails too, bail out
+if [ -z "$remote" ]; then
+    echo "Error: Current branch has no tracking remote, and no 'origin' remote." >&2
+    exit 1
+fi
+
+# Construct the GitHub website URL from the remote URL
+repo_url=$(git remote get-url "$remote" | sed 's,git@github.com:,https://github.com/,' | sed 's,\.git,,')
 
 # Get the current commit hash or branch name
 if [ "$ref_type" = "branch" ]; then
