@@ -39,9 +39,10 @@ git-url-gen.sh [-l line_number] [-b] <path>
    https://github.com/gilessmart/git-url-gen/blob/e8f4df3/test-files
    ```
 
-## Dependencies
+## Requirements
 
 - `jq` is required to properly URL-encode special characters.
+- The repository must have a remote named `origin` - the base of the URL is taken from this remote.
 
 ## Alternatives
 
@@ -57,3 +58,4 @@ https://github.com/gilessmart/git-url-gen/tree/main/test-files/example.txt
 * Use sub-repos (or maybe containers) for testing, so it's possible to test branch name URL encoding.
 * Support repos held on other vendors' platforms - GitLab, BitBucket etc.
 * Replace `-l` option with `path[:line_number]`.
+* Support remotes other than `origin`.
