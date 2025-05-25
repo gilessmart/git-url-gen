@@ -68,6 +68,16 @@ command="./git-url-gen.sh 'test-files/<>:\"\\|?*.txt'"
 expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/test-files/%3C%3E%3A%22%5C%7C%3F*.txt"
 test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
 
+description="With a folder as the path"
+command="./git-url-gen.sh test-files/"
+expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/test-files"
+test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
+
+description="With the current folder (.) as the path"
+command="./git-url-gen.sh ."
+expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash"
+test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
+
 if [ $failed_tests -eq 0 ]; then
     echo "All tests passed"
 else

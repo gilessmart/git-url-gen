@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # Generates a GitHub URL for a file in a git repository at a specific commit or branch.
-# Usage: giturl [-l line_number] [-b] <file_path>
+# Usage: giturl [-l line_number] [-b] <path>
 # Example: giturl -l 42 -b myfile.txt
 
 print_usage_and_exit() {
     reason=$1
     echo "$reason" >&2
-    echo "Usage: giturl [-l line_number] [-b] <file_path>" >&2
+    echo "Usage: giturl [-l line_number] [-b] <path>" >&2
     exit 1
 }
 
@@ -40,10 +40,44 @@ done
 # Shift positional arguments to remove processed options
 shift $((OPTIND - 1))
 
-# Ensure exactly one file path argument is provided
+# Ensure exactly one path argument is provided
 if [ $# != 1 ]; then
-    print_usage_and_exit "Error: Exactly one file_path is required."
+    print_usage_and_exit "Error: Exactly one path is required."
 fi
+
+# Check the path exists
+if ! [ -e "$1" ]; then
+    echo "Error: File or folder '$1' does not exist." >&2
+    exit 1
+fi
+
+# Change to the directory of the supplied path (so git commands are running from there) 
+# and get a full path from the one supplied
+if [ -d "$1" ]; then
+    if [ -n "$line_number" ]; then
+        echo "Error: Line number is invalid when path is a directory" >&2
+        exit 1
+    fi
+    cd "$1"
+    full_path=$(pwd)
+elif [ -f "$1" ]; then
+    cd $(dirname "$1")
+    full_path=$(pwd)/$(basename "$1")
+else
+    echo "Error: '$1' is not a file or a directory." >&2
+    exit 1
+fi
+
+# Get the root path of the git repository
+repo_root_path=$(git rev-parse --show-toplevel 2> /dev/null)
+if [ $? -ne 0 ]; then
+    echo "Error: Path is not part of a git repository." >&2
+    exit 1
+fi
+
+# Get the path relative to the repository root
+relative_path_start=$((${#repo_root_path} + 1))
+relative_path=$(echo "$full_path" | cut -c ${relative_path_start}-)
 
 # Get the repository's remote URL and convert it to an HTTPS GitHub URL
 repo_url=$(git config remote.origin.url | sed 's,git@github.com:,https://github.com/,' | sed 's,\.git,,')
@@ -56,15 +90,6 @@ else
 fi
 if [ -z "$ref" ]; then
     echo "Error: Unable to find a git revision. Ensure the repository has at least one commit." >&2
-    exit 1
-fi
-
-# Get the file path relative to the repository root
-# -z is used becuase ls-files may otherwise add quotes
-# tr is used to remove the null character added by -z
-file_path=$(git ls-files -z --full-name "$1" 2> /dev/null | tr -d '\0')
-if [ -z "$file_path" ]; then
-    echo "Error: File not found in the repository." >&2
     exit 1
 fi
 
@@ -85,9 +110,9 @@ if [ $(which jq 2> /dev/null) ]; then
     fi
 
     # Encode file path using jq
-    file_path=$(echo -n "$file_path" | jq -R -s -r @uri)
+    relative_path=$(echo -n "$relative_path" | jq -R -s -r @uri)
     # Decode characters that GitHub doesn't encode back to what they were 
-    file_path=$(echo "$file_path" \
+    relative_path=$(echo "$relative_path" \
         | sed "s/%2F/\//g" \
         | sed "s/%28/(/g" \
         | sed "s/%29/)/g" \
@@ -97,7 +122,7 @@ if [ $(which jq 2> /dev/null) ]; then
 fi
 
 # Construct the GitHub URL for the file at the specific ref
-file_url=$repo_url/blob/$ref/$file_path
+file_url=$repo_url/blob/$ref$relative_path
 
 # Append the line number fragment to the URL if provided
 if [ -n "$line_number" ]; then

@@ -5,7 +5,7 @@ Shell script that generates a GitHub URL for a file in a git repository.
 ## Usage
 
 ```
-git-url-gen.sh [-l line_number] [-b] <file_path>
+git-url-gen.sh [-l line_number] [-b] <path>
 ```
 
 ### Options
@@ -33,10 +33,14 @@ git-url-gen.sh [-l line_number] [-b] <file_path>
    https://github.com/gilessmart/git-url-gen/blob/main/test-files/example.txt
    ```
 
-## Requirements
+4. Generate the GitHub URL for a folder:
+   ```
+   $ git-url-gen.sh test-files/
+   https://github.com/gilessmart/git-url-gen/blob/e8f4df3/test-files
+   ```
 
-- The script must be run inside a git repository.
-- The file path must be committed to the repository.
+## Dependencies
+
 - `jq` is required to properly URL-encode special characters.
 
 ## Alternatives
@@ -49,7 +53,7 @@ https://github.com/gilessmart/git-url-gen/tree/main/test-files/example.txt
 
 ## Potential Enhancements
 
-* If no file path supplied, produce a URL that links to the repo root.
+* If no path is supplied, produce the URL of the repository root.
 * Use sub-repos (or maybe containers) for testing, so it's possible to test branch name URL encoding.
-* Support repos held on other vendors' - GitLab, BitBucket etc.
-* Replace `-l` option with `file_path[:line_number]`.
+* Support repos held on other vendors' platforms - GitLab, BitBucket etc.
+* Replace `-l` option with `path[:line_number]`.
