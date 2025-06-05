@@ -69,7 +69,7 @@ else
 fi
 
 # Get the root path of the git repository
-repo_root_path=$(git rev-parse --show-toplevel 2> /dev/null)
+repo_root_path=$(git rev-parse --show-toplevel 2>/dev/null)
 if [ $? -ne 0 ]; then
     echo "Error: Path is not part of a git repository." >&2
     exit 1
@@ -79,16 +79,22 @@ fi
 relative_path_start=$((${#repo_root_path} + 1))
 relative_path=$(echo "$full_path" | cut -c ${relative_path_start}-)
 
-# Try to get the remote the current branch is tracking
-remote=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null | cut -d'/' -f1)
-# Failing that, use "origin" if it exists
-if [ -z "$remote" ] && git remote | grep -q '^origin$'; then
-    remote="origin"
-fi
-# If that fails too, bail out
-if [ -z "$remote" ]; then
-    echo "Error: Current branch has no tracking remote, and no 'origin' remote." >&2
+# Determine which remote to use
+remotes=$(git remote)
+remote_count=$(printf "%s" "$remotes" | grep -c .)
+if [ "$remote_count" -eq 0 ]; then
+    echo "Error: No git remotes found in this repository." >&2
     exit 1
+elif [ "$remote_count" -eq 1 ]; then
+    remote="$remotes"
+else
+    # Multiple remotes, try to get the remote the current branch is tracking
+    tracked_remote=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null | cut -d'/' -f1)
+    if [ -z "$tracked_remote" ]; then
+        echo "Error: Multiple remotes found, but current branch is not tracking any remote. Please setup tracking." >&2
+        exit 1
+    fi
+    remote="$tracked_remote"
 fi
 
 # Construct the GitHub website URL from the remote URL
@@ -96,9 +102,9 @@ repo_url=$(git remote get-url "$remote" | sed 's,git@github.com:,https://github.
 
 # Get the current commit hash or branch name
 if [ "$ref_type" = "branch" ]; then
-    ref=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
+    ref=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
 else
-    ref=$(git rev-parse --short HEAD 2> /dev/null)
+    ref=$(git rev-parse --short HEAD 2>/dev/null)
 fi
 if [ -z "$ref" ]; then
     echo "Error: Unable to find a git revision. Ensure the repository has at least one commit." >&2
@@ -106,7 +112,7 @@ if [ -z "$ref" ]; then
 fi
 
 # If we've got jq, use it for URL encoding
-if [ $(which jq 2> /dev/null) ]; then
+if [ $(which jq 2>/dev/null) ]; then
     # If the ref is a branch..
     if [ "$ref_type" = "branch" ]; then
         # Encode using jq
