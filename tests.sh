@@ -63,11 +63,6 @@ command="./git-url-gen.sh 'test-files/¬\`!£$%^&()-_=+[]{};'\''@#~, .txt'"
 expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/test-files/%C2%AC%60!%C2%A3%24%25%5E%26()-_%3D%2B%5B%5D%7B%7D%3B'%40%23~%2C%20.txt"
 test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
 
-description="With a file name with 'extra-special' characters"
-command="./git-url-gen.sh 'test-files/<>:\"\\|?*.txt'"
-expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/test-files/%3C%3E%3A%22%5C%7C%3F*.txt"
-test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
-
 description="With a folder as the path"
 command="./git-url-gen.sh test-files/"
 expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/test-files"

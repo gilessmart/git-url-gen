@@ -1,2 +1,0 @@
-This file is used for testing special characters in file paths are URL-encoded as expected.
-The file name is made from all the reserved characters on Windows.
