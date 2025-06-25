@@ -116,7 +116,7 @@ if [ $(which jq 2>/dev/null) ]; then
     # If the ref is a branch..
     if [ "$ref_type" = "branch" ]; then
         # Encode using jq
-        ref=$(echo -n "$ref" | jq -R -s -r @uri)
+        ref=$(printf "%s" "$ref" | jq -R -s -r @uri)
         # Decode characters that GitHub doesn't encode back to what they were 
         ref=$(echo "$ref" \
             | sed "s/%2F/\//g" \
@@ -128,7 +128,7 @@ if [ $(which jq 2>/dev/null) ]; then
     fi
 
     # Encode file path using jq
-    relative_path=$(echo -n "$relative_path" | jq -R -s -r @uri)
+    relative_path=$(printf "%s" "$relative_path" | jq -R -s -r @uri)
     # Decode characters that GitHub doesn't encode back to what they were 
     relative_path=$(echo "$relative_path" \
         | sed "s/%2F/\//g" \
