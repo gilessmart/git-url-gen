@@ -5,7 +5,7 @@ Shell script that generates a GitHub URL for a file in a git repository.
 ## Usage
 
 ```
-git-url-gen.sh [-l line_number] [-b] <path>
+giturl.sh [-l line_number] [-b] <path>
 ```
 
 ### Options
@@ -17,25 +17,25 @@ git-url-gen.sh [-l line_number] [-b] <path>
 
 1. Generate the GitHub URL for a file:
    ```
-   $ git-url-gen.sh test-files/example.txt
+   $ giturl.sh test-files/example.txt
    https://github.com/gilessmart/git-url-gen/blob/e8f4df3/test-files/example.txt
    ```
 
 2. Generate the GitHub URL for a file with a specific line number:
    ```
-   $ git-url-gen.sh -l 42 test-files/example.txt
+   $ giturl.sh -l 42 test-files/example.txt
    https://github.com/gilessmart/git-url-gen/blob/e8f4df3/test-files/example.txt#L42
    ```
 
 3. Generate the GitHub URL for a file using the current branch name instead of the current commit hash:
    ```
-   $ git-url-gen.sh -b test-files/example.txt
+   $ giturl.sh -b test-files/example.txt
    https://github.com/gilessmart/git-url-gen/blob/main/test-files/example.txt
    ```
 
 4. Generate the GitHub URL for a folder:
    ```
-   $ git-url-gen.sh test-files/
+   $ giturl.sh test-files/
    https://github.com/gilessmart/git-url-gen/blob/e8f4df3/test-files
    ```
 

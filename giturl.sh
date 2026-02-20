@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # Generates a GitHub URL for a file in a git repository at a specific commit or branch.
-# Usage: giturl [-l line_number] [-b] <path>
-# Example: giturl -l 42 -b myfile.txt
+# Usage: giturl.sh [-l line_number] [-b] <path>
+# Example: giturl.sh -l 42 -b myfile.txt
 
 print_usage_and_exit() {
     reason=$1
     echo "$reason" >&2
-    echo "Usage: giturl [-l line_number] [-b] <path>" >&2
+    echo "Usage: giturl.sh [-l line_number] [-b] <path>" >&2
     exit 1
 }
 
