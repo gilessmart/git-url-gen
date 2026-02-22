@@ -16,7 +16,6 @@ while getopts ":l:b" opt; do
     case $opt in
         l)
             # Capture the line number argument
-
             # Ensure the line number is numeric
             if ! echo "$OPTARG" | grep -qE '^[0-9]+$'; then
                 print_usage_and_exit "Line number must be a numeric value."
@@ -88,7 +87,7 @@ if [ "$remote_count" -eq 0 ]; then
 elif [ "$remote_count" -eq 1 ]; then
     remote="$remotes"
 else
-    # Multiple remotes, try to get the remote the current branch is tracking
+    # Multiple remotes: try to get the remote the current branch is tracking
     tracked_remote=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null | cut -d'/' -f1)
     if [ -z "$tracked_remote" ]; then
         echo "Error: Multiple remotes found, but current branch is not tracking any remote. Please setup tracking." >&2
@@ -106,6 +105,7 @@ if [ "$ref_type" = "branch" ]; then
 else
     ref=$(git rev-parse --short HEAD 2>/dev/null)
 fi
+
 if [ -z "$ref" ]; then
     echo "Error: Unable to find a git revision. Ensure the repository has at least one commit." >&2
     exit 1
