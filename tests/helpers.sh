@@ -1,38 +1,22 @@
-setup_remote() {
-    remote=$1
-    url=$2
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export TEST_REPOS_DIR="$SCRIPT_DIR/test-repos"
+export GITURL_PATH="$(realpath $SCRIPT_DIR/../giturl.sh)"
+
+setup_test_repo() {
+    dir_path=$1
+    remote_url=$2
     branch=$3
+    clear_repos=$4
 
-    # Ensure remote exists with correct URL
-    current_url=$(git remote get-url "$remote" 2>/dev/null)
-
-    if [ -z "$current_url" ]; then
-        printf 'Adding remote %s -> %s\n' "$remote" "$url"
-        git remote add "$remote" "$url"
-    elif [ "$current_url" != "$url" ]; then
-        printf 'Updating remote %s URL -> %s\n' "$remote" "$url"
-        git remote set-url "$remote" "$url"
+    if $clear_repos; then
+        printf 'Removing test repo: %s...\n' "$dir_path"
+        rm -rf "$TEST_REPOS_DIR/$dir_path"
     fi
 
-    # Determine current branch (fails cleanly in detached HEAD)
-    current_branch=$(git symbolic-ref --quiet --short HEAD 2>/dev/null)
-    if [ -z "$current_branch" ]; then
-        printf 'Error: repo is in detached HEAD state\n'
-        exit 1
-    fi
-
-    # Check if correct upstream already set
-    current_upstream=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null)
-
-    if [ "$current_upstream" != "$remote/$branch" ]; then
-        # Fetch only if remote-tracking branch missing
-        if ! git show-ref --verify --quiet "refs/remotes/$remote/$branch"; then
-            printf 'Fetching %s\n' "$remote"
-            git fetch "$remote"
-        fi
-
-        printf 'Setting upstream to %s/%s\n' "$remote" "$branch"
-        git branch --set-upstream-to="$remote/$branch"
+    if [[ ! -d $TEST_REPOS_DIR/$dir_path ]]; then
+        printf 'Cloning test repo: %s...\n' "$dir_path"
+        git clone -q -b "$branch" "$remote_url" "$TEST_REPOS_DIR/$dir_path"
+        printf '\n'
     fi
 }
 
@@ -40,26 +24,22 @@ test() {
     description=$1
     command=$2
     expected=$3
-    
-    echo "Test:     $description"
-    echo "Expected: $expected"
+
+    printf 'Test:     %s\n' "$description"
 
     result=$(eval $command 2>&1)
-    if [ $? -ne 0 ]; then
-        echo "Result:   Fail"
-        echo "giturl.sh failed to execute command - $command - $result"
-        echo
+    if [[ $? -ne 0 ]]; then
+        printf 'Failed to execute command\nCommand: %s\nResult: %s\n\n' "$command" "$result"
         return 1
     fi
 
-    echo "Actual:   $result"
+    printf 'Expected: %s\n' "$expected"
+    printf 'Actual:   %s\n' "$result"
 
     if [ "$expected" = "$result" ]; then
-        echo "Result:   Pass"
-        echo
+        printf 'Result:   Pass\n\n'
     else
-        echo "Result:   Fail"
-        echo
+        printf 'Result:   Fail\n\n'
         return 1
     fi
 }

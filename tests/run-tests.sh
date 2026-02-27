@@ -1,56 +1,72 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# Tests the behavior of the giturl.sh script
+# Usage: run-tests.sh [-c]
+#   -c = clear (and recreate) test repos
 
-cwd=$(dirname "$0")
-cd "$cwd"
+set -E # ERR traps are inherited into command subs, subshells etc.
+set -e # exit script if a command fails
+set -u # error on unset variables
+set -o pipefail # pipelines return last non-zero value, or 0
 
-. ./helpers.sh
+trap 'echo "ERROR: line $LINENO: exit code $?" >&2' ERR
 
-setup_remote github "git@github.com:gilessmart/git-url-gen.git" main
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+. $SCRIPT_DIR/helpers.sh
+
+getopts ":c" opt || true
+clear_repos=false
+[[ $opt = c ]] && clear_repos=true
+
+setup_test_repo git-url-gen_main git@github.com:gilessmart/git-url-gen.git main $clear_repos
 
 failed_tests=0
 
-commit_hash=$(git rev-parse --short HEAD)
+commit_hash=$(cd "$TEST_REPOS_DIR/git-url-gen_main" && git rev-parse --short HEAD)
 
-description="With no options"
-command="../giturl.sh test-files/example.txt"
+description="With root level folder path"
+command="'$GITURL_PATH' '$TEST_REPOS_DIR/git-url-gen_main'"
+expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash"
+test "$description" "$command" "$expected" || ((++failed_tests))
+
+description="With root level file path"
+command="'$GITURL_PATH' '$TEST_REPOS_DIR/git-url-gen_main/README.md'"
+expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/README.md"
+test "$description" "$command" "$expected" || ((++failed_tests))
+
+description="With nested folder path"
+command="'$GITURL_PATH' '$TEST_REPOS_DIR/git-url-gen_main/tests/test-files'"
+expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/tests/test-files"
+test "$description" "$command" "$expected" || ((++failed_tests))
+
+description="With nested file path"
+command="'$GITURL_PATH' '$TEST_REPOS_DIR/git-url-gen_main/tests/test-files/example.txt'"
 expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/tests/test-files/example.txt"
-test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
+test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With line number option"
-command="../giturl.sh -l 5 test-files/example.txt"
+command="'$GITURL_PATH' -l 5 '$TEST_REPOS_DIR/git-url-gen_main/tests/test-files/example.txt'"
 expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/tests/test-files/example.txt#L5"
-test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
-
-branch_name=$(git rev-parse --abbrev-ref HEAD)
+test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With branch option"
-command="../giturl.sh -b test-files/example.txt"
-expected="https://github.com/gilessmart/git-url-gen/blob/$branch_name/tests/test-files/example.txt"
-test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
+command="'$GITURL_PATH' -b '$TEST_REPOS_DIR/git-url-gen_main/tests/test-files/example.txt'"
+expected="https://github.com/gilessmart/git-url-gen/blob/main/tests/test-files/example.txt"
+test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With branch and line number options"
-command="../giturl.sh -b -l 5 test-files/example.txt"
-expected="https://github.com/gilessmart/git-url-gen/blob/$branch_name/tests/test-files/example.txt#L5"
-test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
+command="'$GITURL_PATH' -b -l 5 '$TEST_REPOS_DIR/git-url-gen_main/tests/test-files/example.txt'"
+expected="https://github.com/gilessmart/git-url-gen/blob/main/tests/test-files/example.txt#L5"
+test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With a file name with special characters"
-command="../giturl.sh 'test-files/¬\`!£$%^&()-_=+[]{};'\''@#~, .txt'"
+command="'$GITURL_PATH' '$TEST_REPOS_DIR/git-url-gen_main/tests/test-files/¬\`!£$%^&()-_=+[]{};'\''@#~, .txt'"
 expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/tests/test-files/%C2%AC%60!%C2%A3%24%25%5E%26()-_%3D%2B%5B%5D%7B%7D%3B'%40%23~%2C%20.txt"
-test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
+test "$description" "$command" "$expected" || ((++failed_tests))
 
-description="With a folder as the path"
-command="../giturl.sh test-files/"
-expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/tests/test-files"
-test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
+# TODO test branches with special characters
 
-description="With the current folder (.) as the path"
-command="../giturl.sh ."
-expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/tests"
-test "$description" "$command" "$expected" || failed_tests=$(($failed_tests + 1))
-
-if [ $failed_tests -eq 0 ]; then
+if [[ $failed_tests -eq 0 ]]; then
     echo "All tests passed"
 else
     echo "$failed_tests test(s) failed"
