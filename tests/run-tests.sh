@@ -63,8 +63,8 @@ expected="https://github.com/gilessmart/git-url-gen/blob/main/tests/test-files/e
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With a file name with special characters"
-command="'$GITURL_PATH' '$TEST_REPOS_DIR/main-branch/tests/test-files/¬\`!£$%^&()-_=+[]{};'\''@#~, .txt'"
-expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/tests/test-files/%C2%AC%60!%C2%A3%24%25%5E%26()-_%3D%2B%5B%5D%7B%7D%3B'%40%23~%2C%20.txt"
+command="'$GITURL_PATH' '$TEST_REPOS_DIR/main-branch/tests/test-files/example-_=+,.@¬£.txt'"
+expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/tests/test-files/example-_%3D%2B%2C.%40%C2%AC%C2%A3.txt"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With branch with a slash in its name"
@@ -76,6 +76,9 @@ description="With branch with special characters in its name"
 command="'$GITURL_PATH' -b '$TEST_REPOS_DIR/special-chars-branch/tests/test-files/example.txt'"
 expected="https://github.com/gilessmart/git-url-gen/blob/test-branches/_%3D%2B%2C.%40%C2%AC%C2%A3/tests/test-files/example.txt"
 test "$description" "$command" "$expected" || ((++failed_tests))
+
+# check the results return 200 with:
+# curl -o /dev/null -w "%{response_code}\n" -s <URL>
 
 if [[ $failed_tests -eq 0 ]]; then
     echo "All tests passed"

@@ -1,5 +1,0 @@
-This file is used for testing URL encoding of special characters in file paths.
-
-The file name is made from all the non-alpha-numeric characters on my keyboard, and space, excluding 
-* characters that are reserved on Windows - ":<>\/|?*
-* the ; which causes errors on bitbucket

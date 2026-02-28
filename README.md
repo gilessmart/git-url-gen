@@ -17,25 +17,25 @@ giturl.sh [-l line_number] [-b] <path>
 
 1. Generate the GitHub URL for a file:
    ```
-   $ giturl.sh test-files/example.txt
+   $ giturl.sh tests/test-files/example.txt
    https://github.com/gilessmart/git-url-gen/blob/e8f4df3/test-files/example.txt
    ```
 
 2. Generate the GitHub URL for a file with a specific line number:
    ```
-   $ giturl.sh -l 42 test-files/example.txt
+   $ giturl.sh -l 5 tests/test-files/example.txt
    https://github.com/gilessmart/git-url-gen/blob/e8f4df3/test-files/example.txt#L42
    ```
 
 3. Generate the GitHub URL for a file using the current branch name instead of the current commit hash:
    ```
-   $ giturl.sh -b test-files/example.txt
+   $ giturl.sh -b tests/test-files/example.txt
    https://github.com/gilessmart/git-url-gen/blob/main/test-files/example.txt
    ```
 
 4. Generate the GitHub URL for a folder:
    ```
-   $ giturl.sh test-files/
+   $ giturl.sh tests/test-files/
    https://github.com/gilessmart/git-url-gen/blob/e8f4df3/test-files
    ```
 
@@ -55,7 +55,6 @@ https://github.com/gilessmart/git-url-gen/tree/main/test-files/example.txt
 ## Potential Enhancements
 
 * If no path is supplied, produce the URL of the repository root.
-* Use sub-repos (or maybe containers) for testing, so it's possible to test branch name URL encoding.
 * Support repos held on other vendors' platforms - GitLab, BitBucket etc.
 * Replace `-l` option with `path[:line_number]`.
-
+* Alow opening the URL in the user's browser
