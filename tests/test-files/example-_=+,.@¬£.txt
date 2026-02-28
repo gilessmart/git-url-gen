@@ -1,0 +1,6 @@
+File used for testing URL encoding of special characters in file paths.
+
+The file name avoids some special characters: 
+* characters ":<>\/|?* are reserved in Windows file paths
+* characters <>"|`!&() have special meanings in bash (which would complicate testing with bash scripts)
+* ; causes 400 error when browsing to the file on bitbucket
