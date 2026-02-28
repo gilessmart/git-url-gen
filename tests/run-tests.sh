@@ -25,31 +25,31 @@ printf '\n'
 
 failed_tests=0
 
-commit_hash=$(cd "$TEST_REPOS_DIR/main-branch" && git rev-parse --short HEAD)
+main_branch_hash=$(cd "$TEST_REPOS_DIR/main-branch" && git rev-parse --short HEAD)
 
 description="With root level folder path"
 command="'$GITURL_PATH' '$TEST_REPOS_DIR/main-branch'"
-expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash"
+expected="https://github.com/gilessmart/git-url-gen/blob/$main_branch_hash"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With root level file path"
 command="'$GITURL_PATH' '$TEST_REPOS_DIR/main-branch/README.md'"
-expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/README.md"
+expected="https://github.com/gilessmart/git-url-gen/blob/$main_branch_hash/README.md"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With nested folder path"
 command="'$GITURL_PATH' '$TEST_REPOS_DIR/main-branch/tests/test-files'"
-expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/tests/test-files"
+expected="https://github.com/gilessmart/git-url-gen/blob/$main_branch_hash/tests/test-files"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With nested file path"
 command="'$GITURL_PATH' '$TEST_REPOS_DIR/main-branch/tests/test-files/example.txt'"
-expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/tests/test-files/example.txt"
+expected="https://github.com/gilessmart/git-url-gen/blob/$main_branch_hash/tests/test-files/example.txt"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With line number option"
 command="'$GITURL_PATH' -l 5 '$TEST_REPOS_DIR/main-branch/tests/test-files/example.txt'"
-expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/tests/test-files/example.txt#L5"
+expected="https://github.com/gilessmart/git-url-gen/blob/$main_branch_hash/tests/test-files/example.txt#L5"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With branch option"
@@ -64,7 +64,7 @@ test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With a file name with special characters"
 command="'$GITURL_PATH' '$TEST_REPOS_DIR/main-branch/tests/test-files/example-_=+,.@¬£.txt'"
-expected="https://github.com/gilessmart/git-url-gen/blob/$commit_hash/tests/test-files/example-_%3D%2B%2C.%40%C2%AC%C2%A3.txt"
+expected="https://github.com/gilessmart/git-url-gen/blob/$main_branch_hash/tests/test-files/example-_%3D%2B%2C.%40%C2%AC%C2%A3.txt"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With branch with a slash in its name"
