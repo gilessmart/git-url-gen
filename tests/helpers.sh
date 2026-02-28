@@ -16,7 +16,6 @@ setup_test_repo() {
     if [[ ! -d $TEST_REPOS_DIR/$dir_path ]]; then
         printf 'Cloning test repo: %s...\n' "$dir_path"
         git clone -q -b "$branch" "$remote_url" "$TEST_REPOS_DIR/$dir_path"
-        printf '\n'
     fi
 }
 
