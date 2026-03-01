@@ -117,26 +117,14 @@ if [ $(which jq 2>/dev/null) ]; then
     if [ "$ref_type" = "branch" ]; then
         # Encode using jq
         ref=$(printf "%s" "$ref" | jq -R -s -r @uri)
-        # Decode characters that GitHub doesn't encode back to what they were 
-        ref=$(echo "$ref" \
-            | sed "s/%2F/\//g" \
-            | sed "s/%28/(/g" \
-            | sed "s/%29/)/g" \
-            | sed "s/%21/!/g" \
-            | sed "s/%27/'/g" \
-            | sed "s/%2A/*/g")
+        # Decode %2F back to forward slash
+        ref=$(echo "$ref" | sed "s/%2F/\//g")
     fi
 
     # Encode file path using jq
     relative_path=$(printf "%s" "$relative_path" | jq -R -s -r @uri)
-    # Decode characters that GitHub doesn't encode back to what they were 
-    relative_path=$(echo "$relative_path" \
-        | sed "s/%2F/\//g" \
-        | sed "s/%28/(/g" \
-        | sed "s/%29/)/g" \
-        | sed "s/%21/!/g" \
-        | sed "s/%27/'/g" \
-        | sed "s/%2A/*/g")
+    # Decode %2F back to forward slash
+    relative_path=$(echo "$relative_path" | sed "s/%2F/\//g")
 fi
 
 # Construct the GitHub URL for the file at the specific ref
