@@ -18,25 +18,25 @@ giturl.sh [-l line_number] [-b] <path>
 1. Generate the GitHub URL for a file:
    ```
    $ giturl.sh tests/test-files/example.txt
-   https://github.com/gilessmart/git-url-gen/blob/e8f4df3/test-files/example.txt
+   https://github.com/gilessmart/giturl/blob/e8f4df3/test-files/example.txt
    ```
 
 2. Generate the GitHub URL for a file with a specific line number:
    ```
    $ giturl.sh -l 5 tests/test-files/example.txt
-   https://github.com/gilessmart/git-url-gen/blob/e8f4df3/test-files/example.txt#L42
+   https://github.com/gilessmart/giturl/blob/e8f4df3/test-files/example.txt#L42
    ```
 
 3. Generate the GitHub URL for a file using the current branch name instead of the current commit hash:
    ```
    $ giturl.sh -b tests/test-files/example.txt
-   https://github.com/gilessmart/git-url-gen/blob/main/test-files/example.txt
+   https://github.com/gilessmart/giturl/blob/main/test-files/example.txt
    ```
 
 4. Generate the GitHub URL for a folder:
    ```
    $ giturl.sh tests/test-files/
-   https://github.com/gilessmart/git-url-gen/blob/e8f4df3/test-files
+   https://github.com/gilessmart/giturl/blob/e8f4df3/test-files
    ```
 
 ## Requirements
@@ -49,7 +49,7 @@ giturl.sh [-l line_number] [-b] <path>
 The same can be achieved with [GitHub CLI](https://cli.github.com/):
 ```
 $ gh browse -n test-files/example.txt
-https://github.com/gilessmart/git-url-gen/tree/main/test-files/example.txt
+https://github.com/gilessmart/giturl/tree/main/test-files/example.txt
 ```
 
 ## Potential Enhancements
