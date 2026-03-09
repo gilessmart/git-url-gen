@@ -1,6 +1,6 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export TEST_REPOS_DIR="$SCRIPT_DIR/test-repos"
-export GITURL_PATH="$(realpath $SCRIPT_DIR/../giturl.sh)"
+export GITURL_PATH="$(realpath $SCRIPT_DIR/../.venv/bin/giturl)"
 
 setup_test_repo() {
     local dir_path=$1
