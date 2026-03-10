@@ -8,24 +8,27 @@ Python script that generates a GitHub URL for a file in a git repository.
 
 ## Setup
 
-* Setup Python virtual environment & activate
-   ```sh
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
-* Install module into venv
-   ```
-   pip install -e .
-   ```
-   **Or**, to include modules used for development:
-   ```
-   pip install -e ".[dev]"
-   ```
-*  Make the command available by adding a link to it from a directory in the command line $PATH.  
-   E.g. if you've got `~/bin/` in your $PATH:  
-   ```
-   ln -s $(realpath .venv/bin/giturl) ~/bin/
-   ```
+* Setup Python virtual environment:
+  ```sh
+  python -m venv .venv
+  ```
+* Activate virtual environment:
+  ```
+  source .venv/bin/activate
+  ```
+  Or on Windows:  
+  * Git Bash: `source .venv/Scripts/activate`  
+  * Command Prompt: `.venv\Scripts\activate.bat`  
+  * Powershell: `.\.venv\Scripts\Activate.ps1`
+* Install module into venv:
+  ```
+  pip install -e ".[dev]"
+  ```
+* Make `giturl` command available globally:  
+  (On MacOS / Linux / Git Bash, if you've got `~/bin/` in your $PATH)
+  ```
+  ln -s $(realpath .venv/bin/giturl) ~/bin/
+  ```
 
 ## Usage
 

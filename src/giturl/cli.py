@@ -71,7 +71,10 @@ def main():
             sys.exit(1)
         ref = short_hash
 
-    relative_path = "" if full_path == repo_root else quote("/" + os.path.relpath(full_path, repo_root).replace(os.sep, "/"))
+    if os.path.samefile(full_path, repo_root):
+        relative_path = ""
+    else:
+        relative_path = "/" + quote(os.path.relpath(full_path, repo_root).replace(os.sep, "/"))
 
     file_url = f"{repo_url}/blob/{ref}{relative_path}"
     if line_number is not None:

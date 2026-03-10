@@ -30,57 +30,57 @@ ssh_main_hash=$(cd "$TEST_REPOS_DIR/ssh-main" && git rev-parse --short HEAD)
 https_main_hash=$(cd "$TEST_REPOS_DIR/https-main" && git rev-parse --short HEAD)
 
 description="With root level folder path"
-command="'$GITURL_PATH' '$TEST_REPOS_DIR/ssh-main'"
+command="python -m giturl '$TEST_REPOS_DIR/ssh-main'"
 expected="https://github.com/gilessmart/giturl/blob/$ssh_main_hash"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With root level file path"
-command="'$GITURL_PATH' '$TEST_REPOS_DIR/ssh-main/README.md'"
+command="python -m giturl '$TEST_REPOS_DIR/ssh-main/README.md'"
 expected="https://github.com/gilessmart/giturl/blob/$ssh_main_hash/README.md"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With nested folder path"
-command="'$GITURL_PATH' '$TEST_REPOS_DIR/ssh-main/tests/test-files'"
+command="python -m giturl '$TEST_REPOS_DIR/ssh-main/tests/test-files'"
 expected="https://github.com/gilessmart/giturl/blob/$ssh_main_hash/tests/test-files"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With nested file path"
-command="'$GITURL_PATH' '$TEST_REPOS_DIR/ssh-main/tests/test-files/example.txt'"
+command="python -m giturl '$TEST_REPOS_DIR/ssh-main/tests/test-files/example.txt'"
 expected="https://github.com/gilessmart/giturl/blob/$ssh_main_hash/tests/test-files/example.txt"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With line number option"
-command="'$GITURL_PATH' -l 5 '$TEST_REPOS_DIR/ssh-main/tests/test-files/example.txt'"
+command="python -m giturl -l 5 '$TEST_REPOS_DIR/ssh-main/tests/test-files/example.txt'"
 expected="https://github.com/gilessmart/giturl/blob/$ssh_main_hash/tests/test-files/example.txt#L5"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With branch option"
-command="'$GITURL_PATH' -b '$TEST_REPOS_DIR/ssh-main/tests/test-files/example.txt'"
+command="python -m giturl -b '$TEST_REPOS_DIR/ssh-main/tests/test-files/example.txt'"
 expected="https://github.com/gilessmart/giturl/blob/main/tests/test-files/example.txt"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With branch and line number options"
-command="'$GITURL_PATH' -b -l 5 '$TEST_REPOS_DIR/ssh-main/tests/test-files/example.txt'"
+command="python -m giturl -b -l 5 '$TEST_REPOS_DIR/ssh-main/tests/test-files/example.txt'"
 expected="https://github.com/gilessmart/giturl/blob/main/tests/test-files/example.txt#L5"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With a file name with special characters"
-command="'$GITURL_PATH' '$TEST_REPOS_DIR/ssh-main/tests/test-files/example-_=+,.@¬£.txt'"
+command="python -m giturl '$TEST_REPOS_DIR/ssh-main/tests/test-files/example-_=+,.@¬£.txt'"
 expected="https://github.com/gilessmart/giturl/blob/$ssh_main_hash/tests/test-files/example-_%3D%2B%2C.%40%C2%AC%C2%A3.txt"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With branch with a slash in its name"
-command="'$GITURL_PATH' -b '$TEST_REPOS_DIR/ssh-slash-branch/tests/test-files/example.txt'"
+command="python -m giturl -b '$TEST_REPOS_DIR/ssh-slash-branch/tests/test-files/example.txt'"
 expected="https://github.com/gilessmart/giturl/blob/test-branches/abc/tests/test-files/example.txt"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With branch with special characters in its name"
-command="'$GITURL_PATH' -b '$TEST_REPOS_DIR/ssh-special-chars-branch/tests/test-files/example.txt'"
+command="python -m giturl -b '$TEST_REPOS_DIR/ssh-special-chars-branch/tests/test-files/example.txt'"
 expected="https://github.com/gilessmart/giturl/blob/test-branches/_%3D%2B%2C.%40%C2%AC%C2%A3/tests/test-files/example.txt"
 test "$description" "$command" "$expected" || ((++failed_tests))
 
 description="With https remote URL"
-command="'$GITURL_PATH' '$TEST_REPOS_DIR/https-main/tests/test-files/example.txt'"
+command="python -m giturl '$TEST_REPOS_DIR/https-main/tests/test-files/example.txt'"
 expected="https://github.com/gilessmart/giturl/blob/$https_main_hash/tests/test-files/example.txt"
 test "$description" "$command" "$expected" || ((++failed_tests))
 

@@ -4,12 +4,13 @@ import subprocess
 
 def get_repo_root(path: str) -> str | None:
     dir_path = path if os.path.isdir(path) else os.path.dirname(path)
-    result = subprocess.run(["git", "rev-parse", "--show-toplevel"], text=True, capture_output=True, cwd=dir_path)
-    return result.stdout.strip() if result.returncode == 0 else None
+    result = subprocess.run(["git", "rev-parse", "--show-toplevel"], text=True, capture_output=True, encoding="utf-8", cwd=dir_path)
+    # normalise the path because git returns a path with forward slashes on Windows
+    return os.path.normpath(result.stdout.strip()) if result.returncode == 0 else None # None indicates the path was not part of a git repository
 
 
 def get_remotes(repo_root: str) -> list[str]:
-    remotes = subprocess.check_output(["git", "remote"], text=True, cwd=repo_root).splitlines()
+    remotes = subprocess.check_output(["git", "remote"], text=True, encoding="utf-8", cwd=repo_root).splitlines()
     return [r.strip() for r in remotes if r]
 
 
@@ -18,17 +19,18 @@ def get_upstream(repo_root: str) -> str | None:
         ["git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"],
         text=True,
         capture_output=True,
+        encoding="utf-8",
         cwd=repo_root
     )
     return result.stdout.strip() if result.returncode == 0 else None
 
 
 def get_remote_url(repo_root: str, remote: str) -> str:
-    return subprocess.check_output(["git", "remote", "get-url", remote], text=True, cwd=repo_root).strip()
+    return subprocess.check_output(["git", "remote", "get-url", remote], text=True, encoding="utf-8", cwd=repo_root).strip()
 
 
 def get_current_branch_name(repo_root: str) -> str | None:
-    branch = subprocess.check_output(["git", "branch", "--show-current"], text=True, cwd=repo_root).strip()
+    branch = subprocess.check_output(["git", "branch", "--show-current"], text=True, encoding="utf-8", cwd=repo_root).strip()
     return branch if branch else None # If the branch name is empty, return None to indicate we're in a detached HEAD state
 
 
