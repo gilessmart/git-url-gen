@@ -6,29 +6,25 @@ Python script that generates a GitHub URL for a file in a git repository.
 
 * Python 3
 
-## Setup
+## Installation
 
-* Setup Python virtual environment:
-  ```sh
-  python -m venv .venv
-  ```
-* Activate virtual environment:
-  ```
-  source .venv/bin/activate
-  ```
-  Or on Windows:  
-  * Git Bash: `source .venv/Scripts/activate`  
-  * Command Prompt: `.venv\Scripts\activate.bat`  
-  * Powershell: `.\.venv\Scripts\Activate.ps1`
-* Install module into venv:
-  ```
-  pip install -e ".[dev]"
-  ```
-* Make `giturl` command available globally:  
-  (On MacOS / Linux / Git Bash, if you've got `~/bin/` in your $PATH)
-  ```
-  ln -s $(realpath .venv/bin/giturl) ~/bin/
-  ```
+```
+pip install --user .
+```
+
+The directory where `pip` installs modules may need to be added to your PATH environment variable.
+
+**Upgrade**
+
+```
+pip install --user --upgrade .
+```
+
+**Reinstall**
+
+```
+pip install --user --force-reinstall .
+```
 
 ## Usage
 
@@ -67,6 +63,25 @@ giturl [-l line_number] [-b] <path>
    https://github.com/gilessmart/giturl/blob/e8f4df3/test-files
    ```
 
+## Development Setup
+
+* Setup Python virtual environment:
+  ```sh
+  python -m venv .venv
+  ```
+* Activate virtual environment:
+  ```
+  source .venv/bin/activate
+  ```
+  Or on Windows:  
+  * Git Bash: `source .venv/Scripts/activate`  
+  * Command Prompt: `.venv\Scripts\activate.bat`  
+  * Powershell: `.\.venv\Scripts\Activate.ps1`
+* Install module into venv:
+  ```
+  pip install -e ".[dev]"
+  ```
+
 ## Alternatives
 
 The same can be achieved with [GitHub CLI](https://cli.github.com/):
@@ -74,6 +89,8 @@ The same can be achieved with [GitHub CLI](https://cli.github.com/):
 $ gh browse -n test-files/example.txt
 https://github.com/gilessmart/giturl/tree/main/test-files/example.txt
 ```
+
+But hopefully this can be enhanced in future to work with GitLab, BitBucket etc.
 
 ## Potential Enhancements
 
