@@ -1,70 +1,71 @@
-from enum import Enum
+from enum import Enum, auto
 
-class TemplateParser:
-    class State(Enum):
-        PLAIN_TEXT = 1
-        FILL_POINT_SEGMENT = 2
-        FILL_POINT = 3
+class State(Enum):
+    PLAIN_TEXT = auto()
+    FILL_POINT_SEGMENT = auto()
+    FILL_POINT = auto()
 
-    def parse(self, template_str: str) -> Template:
-        self.state = self.State.PLAIN_TEXT
+def parse_template(template_str: str) -> Template:
+    state = State.PLAIN_TEXT
 
-        self.text_buf = ""
-        self.raw_fp_segment_buf = ""
-        self.segments: list[str | FillPointSegment] = []
-        self.fp_names = []
-        self.fill_point_name_buf = ""
+    text_buf = ""
+    raw_fp_segment_buf = ""
+    segments = []
+    fp_names = []
+    fill_point_name_buf = ""
 
-        for char in template_str:
-            self.process_char(char)
+    def process_char(char: str):
+        nonlocal state, text_buf, raw_fp_segment_buf, fp_names, fill_point_name_buf
 
-        if self.state != self.State.PLAIN_TEXT:
-            raise ValueError(f"Unclosed fill point segment in template string: {template_str}")
-        
-        if self.text_buf:
-            self.segments.append(self.text_buf)
-
-        return Template(self.segments)
-    
-    def process_char(self, char: str):
-        match self.state:
-            case self.State.PLAIN_TEXT:
+        match state:
+            case State.PLAIN_TEXT:
                 if char == "{":
-                    # close out text
-                    if self.text_buf:
-                        self.segments.append(self.text_buf)
+                    # close text
+                    if text_buf:
+                        segments.append(text_buf)
                     # open fill point segment
-                    self.raw_fp_segment_buf = ""
-                    self.fp_names = []
-                    self.state = self.State.FILL_POINT_SEGMENT
+                    raw_fp_segment_buf = ""
+                    fp_names = []
+                    state = State.FILL_POINT_SEGMENT
                 else:
-                    self.text_buf += char
+                    text_buf += char
 
-            case self.State.FILL_POINT_SEGMENT:
+            case State.FILL_POINT_SEGMENT:
                 if char == "{":
-                    self.raw_fp_segment_buf += char
+                    raw_fp_segment_buf += char
                     # open fill point
-                    self.fill_point_name_buf = ""
-                    self.state = self.State.FILL_POINT
+                    fill_point_name_buf = ""
+                    state = State.FILL_POINT
                 elif char == "}":
                     # close fill point segment
-                    self.segments.append(FillPointSegment(self.raw_fp_segment_buf, self.fp_names))
+                    segments.append(FillPointSegment(raw_fp_segment_buf, fp_names))
                     # open text
-                    self.text_buf = ""
-                    self.state = self.State.PLAIN_TEXT
+                    text_buf = ""
+                    state = State.PLAIN_TEXT
                 else:
-                    self.raw_fp_segment_buf += char
+                    raw_fp_segment_buf += char
 
-            case self.State.FILL_POINT:
+            case State.FILL_POINT:
                 if char == "}":
-                    self.raw_fp_segment_buf += char
+                    raw_fp_segment_buf += char
                     # close fill point
-                    self.fp_names.append(self.fill_point_name_buf)
+                    fp_names.append(fill_point_name_buf)
                     # back to fill point segment
-                    self.state = self.State.FILL_POINT_SEGMENT
+                    state = State.FILL_POINT_SEGMENT
                 else:
-                    self.raw_fp_segment_buf += char
-                    self.fill_point_name_buf += char
+                    raw_fp_segment_buf += char
+                    fill_point_name_buf += char
+
+    for char in template_str:
+        process_char(char)
+
+    if state != State.PLAIN_TEXT:
+        raise ValueError(f"Unclosed fill point segment in template string: {template_str}")
+
+    if text_buf:
+        segments.append(text_buf)
+
+    return Template(segments)
 
 
 class Template:

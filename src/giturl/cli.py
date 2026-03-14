@@ -6,7 +6,7 @@ import sys
 from urllib.parse import quote
 
 import giturl.git as git
-from giturl.url_templates import TemplateParser
+from giturl.url_templates import parse_template
 
 
 def parse_args() -> tuple[str, int | None, bool | None]:
@@ -34,7 +34,7 @@ def generate_url(remote_url: str, url_args: dict) -> str:
     for pattern, template_str in url_configs.items():
         match = re.search(pattern, remote_url)
         if match:
-            template = TemplateParser().parse(template_str)
+            template = parse_template(template_str)
             return template.apply(match.groupdict() | url_args)
     
     print(f"Error: No config matched remote URL {remote_url}", file=sys.stderr)

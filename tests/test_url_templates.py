@@ -1,11 +1,10 @@
 import pytest
 
-from giturl.url_templates import TemplateParser, FillPointSegment
+from giturl.url_templates import FillPointSegment, parse_template
 
 
 def test_TemplateParser_apply__github_template__missing_line_number_argument():
-    parser = TemplateParser()
-    template = parser.parse("https://github.com/{{account}}/{{repo}}/blob/{{ref}}{{path}}{#L{line_number}}")
+    template = parse_template("https://github.com/{{account}}/{{repo}}/blob/{{ref}}{{path}}{#L{line_number}}")
     url = template.apply({
         "account": "gilessmart",
         "repo": "giturl",
@@ -15,8 +14,7 @@ def test_TemplateParser_apply__github_template__missing_line_number_argument():
     assert url == "https://github.com/gilessmart/giturl/blob/main/src/giturl/cli.py"
 
 def test_TemplateParser_apply__github_template__with_line_number_argument():
-    parser = TemplateParser()
-    template = parser.parse("https://github.com/{{account}}/{{repo}}/blob/{{ref}}{{path}}{#L{line_number}}")
+    template = parse_template("https://github.com/{{account}}/{{repo}}/blob/{{ref}}{{path}}{#L{line_number}}")
     url = template.apply({
         "account": "gilessmart",
         "repo": "giturl",
@@ -28,9 +26,8 @@ def test_TemplateParser_apply__github_template__with_line_number_argument():
 
 
 def test_TemplateParser_parse__incomplete_fill_point():
-    parser = TemplateParser()
     with pytest.raises(ValueError) as err:
-        parser.parse("https://github.com/{account}/{repo}/blob/{ref}{pat")
+        parse_template("https://github.com/{account}/{repo}/blob/{ref}{pat")
     assert "Unclosed fill point segment in template string" in str(err.value)
 
 
