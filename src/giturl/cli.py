@@ -1,10 +1,12 @@
 import argparse
 import os
 import pathlib
+import re
 import sys
 from urllib.parse import quote
 
 import giturl.git as git
+from giturl.url_templates import TemplateParser
 
 
 def parse_args() -> tuple[str, int | None, bool | None]:
@@ -23,12 +25,20 @@ def parse_args() -> tuple[str, int | None, bool | None]:
     return args.path, args.line_number, args.branch_mode
 
 
-def get_base_url(remote_url: str) -> str:
-    if remote_url.startswith("git@github.com:"):
-        remote_url = remote_url.replace("git@github.com:", "https://github.com/")
-    if remote_url.endswith(".git"):
-        remote_url = remote_url[: -len(".git")]
-    return remote_url
+url_configs = {
+    r"github.com[:/](?P<account>.*?)/(?P<repo>.*?).git": "https://github.com/{{account}}/{{repo}}/blob/{{ref}}{{path}}{#L{line_number}}",
+    r"bitbucket.org[:/](?P<account>.*?)/(?P<repo>.*?).git": "https://bitbucket.org/{{account}}/{{repo}}/src/{{ref}}{{path}}{#line-{line_number}}",
+}
+
+def generate_url(remote_url: str, url_args: dict) -> str:
+    for pattern, template_str in url_configs.items():
+        match = re.search(pattern, remote_url)
+        if match:
+            template = TemplateParser().parse(template_str)
+            return template.apply(match.groupdict() | url_args)
+    
+    print(f"Error: No config matched remote URL {remote_url}", file=sys.stderr)
+    sys.exit(1)
 
 
 def main():
@@ -56,7 +66,6 @@ def main():
         remote = upstream.split("/")[0]
 
     remote_url = git.get_remote_url(repo_root, remote)
-    repo_url = get_base_url(remote_url)
 
     if branch_mode:
         branch_name = git.get_current_branch_name(repo_root)
@@ -76,8 +85,10 @@ def main():
     else:
         relative_path = "/" + quote(os.path.relpath(full_path, repo_root).replace(os.sep, "/"))
 
-    file_url = f"{repo_url}/blob/{ref}{relative_path}"
-    if line_number is not None:
-        file_url = f"{file_url}#L{line_number}"
+    url = generate_url(remote_url, {
+        "ref": ref,
+        "path": relative_path,
+        "line_number": str(line_number) if line_number is not None else None,
+    })
 
-    print(file_url)
+    print(url)
